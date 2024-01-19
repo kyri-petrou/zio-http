@@ -13,7 +13,7 @@ ThisBuild / resolvers +=
 
 // CI Configuration
 ThisBuild / githubWorkflowJavaVersions := Seq(
-  JavaSpec.graalvm(Graalvm.Distribution("graalvm"), "17"),
+  JavaSpec.graalvm(Graalvm.Distribution("graalvm"), "17.0.9"),
   JavaSpec.temurin("8"),
 )
 ThisBuild / githubWorkflowPREventTypes := Seq(
