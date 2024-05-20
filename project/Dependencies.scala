@@ -1,7 +1,7 @@
 import sbt.*
 
 object Dependencies {
-  val JwtCoreVersion                = "9.1.1"
+  val JwtCoreVersion                = "9.1.2"
   val NettyVersion                  = "4.1.101.Final"
   val NettyIncubatorVersion         = "0.0.24.Final"
   val ScalaCompactCollectionVersion = "2.11.0"
@@ -14,8 +14,8 @@ object Dependencies {
   val `jwt-core`                 = "com.github.jwt-scala"   %% "jwt-core"                % JwtCoreVersion
   val `scala-compact-collection` = "org.scala-lang.modules" %% "scala-collection-compat" % ScalaCompactCollectionVersion
 
-  val scalafmt = "org.scalameta" %% "scalafmt-dynamic" % "3.8.1"
-  val scalametaParsers = "org.scalameta" %% "parsers" % "4.9.3"
+  val scalafmt         = "org.scalameta" %% "scalafmt-dynamic" % "3.8.1"
+  val scalametaParsers = "org.scalameta" %% "parsers"          % "4.9.3"
 
   val netty =
     Seq(
