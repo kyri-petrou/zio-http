@@ -281,6 +281,8 @@ lazy val zioHttpExample = (project in file("zio-http-example"))
   .settings(runSettings(Debug.Main))
   .settings(libraryDependencies ++= Seq(`jwt-core`, `zio-schema-json`))
   .settings(
+    run / fork := true,
+    run / javaOptions ++= Seq("-Xms4G", "-Xmx4G", "-XX:+UseG1GC"),
     libraryDependencies ++= Seq(
       "dev.zio" %% "zio-config"                        % ZioConfigVersion,
       "dev.zio" %% "zio-config-typesafe"               % ZioConfigVersion,
