@@ -40,13 +40,15 @@ object ServerSentEventEndpointSpec extends ZIOHttpSpec {
       : Invocation[Unit, Unit, ZNothing, ZStream[Any, Nothing, ServerSentEvent[String]], AuthType.None] =
       sseEndpoint(())
 
-    def client(port: Int): ZIO[Scope, Throwable, Chunk[ServerSentEvent[String]]] =
-      (for {
-        client <- ZIO.service[Client]
-        executor = EndpointExecutor(client, locator(port))
-        stream <- executor(invocation)
-        events <- stream.take(5).runCollect
-      } yield events).provideSome[Scope](ZClient.default)
+    def client(port: Int): ZIO[Any, Throwable, Chunk[ServerSentEvent[String]]] =
+      ZIO
+        .scoped(for {
+          client <- ZIO.service[Client]
+          executor = EndpointExecutor(client, locator(port))
+          stream <- executor(invocation)
+          events <- stream.take(5).runCollect
+        } yield events)
+        .provideLayer(ZClient.default)
   }
 
   object JsonPayload {
@@ -77,16 +79,18 @@ object ServerSentEventEndpointSpec extends ZIOHttpSpec {
       : Invocation[Unit, Unit, ZNothing, ZStream[Any, Nothing, ServerSentEvent[Payload]], AuthType.None] =
       sseEndpoint(())
 
-    def client(port: Int): ZIO[Scope, Throwable, Chunk[ServerSentEvent[Payload]]] =
-      (for {
-        client <- ZIO.service[Client]
-        executor = EndpointExecutor(client, locator(port))
-        stream <- executor(invocation)
-        events <- stream.take(5).runCollect
-      } yield events).provideSome[Scope](ZClient.default)
+    def client(port: Int): ZIO[Any, Throwable, Chunk[ServerSentEvent[Payload]]] =
+      ZIO
+        .scoped(for {
+          client <- ZIO.service[Client]
+          executor = EndpointExecutor(client, locator(port))
+          stream <- executor(invocation)
+          events <- stream.take(5).runCollect
+        } yield events)
+        .provideLayer(ZClient.default)
   }
 
-  override def spec: Spec[TestEnvironment with Scope, Any] =
+  override def spec: Spec[TestEnvironment, Any] =
     suite("ServerSentEventSpec")(
       test("Send and receive ServerSentEvent with string payload") {
         import StringPayload._
@@ -95,7 +99,7 @@ object ServerSentEventEndpointSpec extends ZIOHttpSpec {
           port   <- ZIO.serviceWithZIO[Server](_.port)
           events <- client(port)
         } yield assertTrue(events.size == 5 && events.forall(event => Try(ISO_LOCAL_TIME.parse(event.data)).isSuccess))
-      }.provideSome[Scope](Server.defaultWithPort(0)),
+      }.provide(Server.defaultWithPort(0)),
       test("Send and receive ServerSentEvent with json payload") {
         import JsonPayload._
         for {
@@ -103,6 +107,6 @@ object ServerSentEventEndpointSpec extends ZIOHttpSpec {
           port   <- ZIO.serviceWithZIO[Server](_.port)
           events <- client(port)
         } yield assertTrue(events.size == 5 && events.forall(event => Try(event.data.timeStamp).isSuccess))
-      }.provideSome[Scope](Server.defaultWithPort(0)),
+      }.provide(Server.defaultWithPort(0)),
     ) @@ TestAspect.withLiveClock
 }
